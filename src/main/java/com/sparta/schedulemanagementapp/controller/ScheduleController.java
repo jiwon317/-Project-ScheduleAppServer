@@ -3,23 +3,21 @@ package com.sparta.schedulemanagementapp.controller;
 import com.sparta.schedulemanagementapp.dto.ScheduleRequestDto;
 import com.sparta.schedulemanagementapp.dto.ScheduleResponseDto;
 import com.sparta.schedulemanagementapp.service.ScheduleService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class ScheduleController {
-    // MemoController -> MemoService -> MemoRepository (강한 결합)
-    private final com.sparta.schedulemanagementapp.service.ScheduleService scheduleService;
+    private final ScheduleService scheduleService;
 
-    public ScheduleController(com.sparta.schedulemanagementapp.service.ScheduleService scheduleService) {
-        this.scheduleService = scheduleService;
-    }
 
     @PostMapping("/schedule")
     public ScheduleResponseDto createSchedule(@RequestBody ScheduleRequestDto requestDto) {
-        return ScheduleService.createSchedule(requestDto);
+        return scheduleService.createSchedule(requestDto);
     }
 
     @GetMapping("/schedule")
@@ -28,12 +26,8 @@ public class ScheduleController {
     }
 
     @GetMapping("/schedule/contents")
-    public List<ScheduleResponseDto> getScheduleByKeyword(String keyword) {
-        return scheduleService.getScheduleByKeyword(keyword);
-    }
-    @GetMapping("/schedule/title")
-    public List<ScheduleResponseDto> getScheduleByKeyword(String keyword) {
-        return scheduleService.getScheduleByKeyword(keyword);
+    public ScheduleResponseDto getScheduleByKeyword(Long id) {
+        return scheduleService.getScheduleByKeyword(id);
     }
 
     @PutMapping("/schedule/{id}")

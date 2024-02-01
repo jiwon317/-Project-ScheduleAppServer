@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-// @RequiredArgsConstructor 롬복 방식 : final 생성자 필요
+@RequiredArgsConstructor
 public class ScheduleService { //memoService AutoWired annotation 방식
 
     //    @Autowired
@@ -24,18 +24,6 @@ public class ScheduleService { //memoService AutoWired annotation 방식
 //    public void setDi(MemoRepository memoRepository) {
 //        this.memoRepository = memoRepository;
 //    }
-
-    public ScheduleService(ScheduleRepository scheduleRepository) {
-        // 파라미터에 ApplicationContext context넣으면 수동 방법(IOC 컨테이너에 직접 접근)
-        // 1. 'Bean' 이름으로 가져오기
-//        MemoRepository memoRepository = (MemoRepository) context.getBean("memoRepository");
-//        this.memoRepository = memoRepository;
-
-        // 2. 'Bean' 클래스 형식으로 가져오기
-//        MemoRepository memoRepository = context.getBean(MemoRepository.class);
-        this.scheduleRepository = scheduleRepository;
-
-    }
 
     @Transactional
     public Long updateSchedule(Long id, ScheduleRequestDto requestDto) {
@@ -48,11 +36,11 @@ public class ScheduleService { //memoService AutoWired annotation 방식
     }
 
     public Long deleteSchedule(Long id) {
-        // 해당 메모가 DB에 존재하는지 확인
+        // 해당 스케줄이 DB에 존재하는지 확인
         Schedule schedule = findSchedule(id);
 
-        // memo 삭제
-        ScheduleRepository.delete(schedule);
+        // schedule 삭제
+        scheduleRepository.delete(schedule);
 
         return id;
     }
@@ -62,7 +50,7 @@ public class ScheduleService { //memoService AutoWired annotation 방식
         Schedule schedule = new Schedule(requestDto);
 
         // DB 저장
-        Schedule saveSchedule = ScheduleRepository.save(schedule);
+        Schedule saveSchedule = scheduleRepository.save(schedule);
 
         // Entity -> ResponseDto
         ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(schedule);
@@ -75,8 +63,9 @@ public class ScheduleService { //memoService AutoWired annotation 방식
         return scheduleRepository.findAllByOrderByModifiedAtDesc().stream().map(ScheduleResponseDto::new).toList();
     }
 
-    public List<ScheduleResponseDto> getMemosByKeyword(String keyword) {
-        return scheduleRepository.findAllByContentsContainsOrderByModifiedAtDesc(keyword).stream().map(ScheduleResponseDto::new).toList();
+    public ScheduleResponseDto getScheduleByKeyword(Long id) {
+        Schedule schedule = scheduleRepository.findById(id).orElseThrow(); //람다
+        return new ScheduleResponseDto(schedule);
     }
 
     private Schedule findSchedule(Long id) {
